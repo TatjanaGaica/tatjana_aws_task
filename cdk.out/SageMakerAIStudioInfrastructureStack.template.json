@@ -1,0 +1,1117 @@
+{
+ "Description": "CDK stack for SageMaker AI Studio foundational infrastructure.",
+ "Resources": {
+  "VPCFlowLogRole9538FF26": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "vpc-flow-logs.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Description": "IAM role for VPC Flow Logs to CloudWatch Logs."
+   },
+   "Metadata": {
+    "aws:cdk:path": "SageMakerAIStudioInfrastructureStack/VPCFlowLogRole/Resource"
+   }
+  },
+  "VPCFlowLogRoleDefaultPolicy90D215A5": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:DescribeLogGroups",
+        "logs:DescribeLogStreams",
+        "logs:PutLogEvents"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": [
+        "logs:CreateLogStream",
+        "logs:DescribeLogStreams",
+        "logs:PutLogEvents"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "VPCFlowLogGroup9559E1E7",
+         "Arn"
+        ]
+       }
+      },
+      {
+       "Action": "iam:PassRole",
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "VPCFlowLogRole9538FF26",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "VPCFlowLogRoleDefaultPolicy90D215A5",
+    "Roles": [
+     {
+      "Ref": "VPCFlowLogRole9538FF26"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "SageMakerAIStudioInfrastructureStack/VPCFlowLogRole/DefaultPolicy/Resource"
+   }
+  },
+  "VPCFlowLogGroup9559E1E7": {
+   "Type": "AWS::Logs::LogGroup",
+   "Properties": {
+    "LogGroupName": "/aws/vpc/flow-logs/SageMakerAIStudioInfrastructureStack-VPC",
+    "RetentionInDays": 30
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "SageMakerAIStudioInfrastructureStack/VPCFlowLogGroup/Resource"
+   }
+  },
+  "SageMakerAIStudioVPCA83855BE": {
+   "Type": "AWS::EC2::VPC",
+   "Properties": {
+    "CidrBlock": "10.0.0.0/16",
+    "EnableDnsHostnames": true,
+    "EnableDnsSupport": true,
+    "InstanceTenancy": "default",
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "SageMakerAIStudioInfrastructureStack/SageMakerAIStudioVPC"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "SageMakerAIStudioInfrastructureStack/SageMakerAIStudioVPC/Resource"
+   }
+  },
+  "SageMakerAIStudioVPCPublicSubnet1SubnetA99048A6": {
+   "Type": "AWS::EC2::Subnet",
+   "Properties": {
+    "AvailabilityZone": "eu-central-1a",
+    "CidrBlock": "10.0.0.0/24",
+    "MapPublicIpOnLaunch": true,
+    "Tags": [
+     {
+      "Key": "aws-cdk:subnet-name",
+      "Value": "Public"
+     },
+     {
+      "Key": "aws-cdk:subnet-type",
+      "Value": "Public"
+     },
+     {
+      "Key": "Name",
+      "Value": "SageMakerAIStudioInfrastructureStack/SageMakerAIStudioVPC/PublicSubnet1"
+     }
+    ],
+    "VpcId": {
+     "Ref": "SageMakerAIStudioVPCA83855BE"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SageMakerAIStudioInfrastructureStack/SageMakerAIStudioVPC/PublicSubnet1/Subnet"
+   }
+  },
+  "SageMakerAIStudioVPCPublicSubnet1RouteTable8D10C674": {
+   "Type": "AWS::EC2::RouteTable",
+   "Properties": {
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "SageMakerAIStudioInfrastructureStack/SageMakerAIStudioVPC/PublicSubnet1"
+     }
+    ],
+    "VpcId": {
+     "Ref": "SageMakerAIStudioVPCA83855BE"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SageMakerAIStudioInfrastructureStack/SageMakerAIStudioVPC/PublicSubnet1/RouteTable"
+   }
+  },
+  "SageMakerAIStudioVPCPublicSubnet1RouteTableAssociation5F72DBEF": {
+   "Type": "AWS::EC2::SubnetRouteTableAssociation",
+   "Properties": {
+    "RouteTableId": {
+     "Ref": "SageMakerAIStudioVPCPublicSubnet1RouteTable8D10C674"
+    },
+    "SubnetId": {
+     "Ref": "SageMakerAIStudioVPCPublicSubnet1SubnetA99048A6"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SageMakerAIStudioInfrastructureStack/SageMakerAIStudioVPC/PublicSubnet1/RouteTableAssociation"
+   }
+  },
+  "SageMakerAIStudioVPCPublicSubnet1DefaultRoute3EE529CE": {
+   "Type": "AWS::EC2::Route",
+   "Properties": {
+    "DestinationCidrBlock": "0.0.0.0/0",
+    "GatewayId": {
+     "Ref": "SageMakerAIStudioVPCIGW67E658CD"
+    },
+    "RouteTableId": {
+     "Ref": "SageMakerAIStudioVPCPublicSubnet1RouteTable8D10C674"
+    }
+   },
+   "DependsOn": [
+    "SageMakerAIStudioVPCVPCGW35AB19BC"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "SageMakerAIStudioInfrastructureStack/SageMakerAIStudioVPC/PublicSubnet1/DefaultRoute"
+   }
+  },
+  "SageMakerAIStudioVPCPublicSubnet1EIP9700512A": {
+   "Type": "AWS::EC2::EIP",
+   "Properties": {
+    "Domain": "vpc",
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "SageMakerAIStudioInfrastructureStack/SageMakerAIStudioVPC/PublicSubnet1"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "SageMakerAIStudioInfrastructureStack/SageMakerAIStudioVPC/PublicSubnet1/EIP"
+   }
+  },
+  "SageMakerAIStudioVPCPublicSubnet1NATGatewayE45D9680": {
+   "Type": "AWS::EC2::NatGateway",
+   "Properties": {
+    "AllocationId": {
+     "Fn::GetAtt": [
+      "SageMakerAIStudioVPCPublicSubnet1EIP9700512A",
+      "AllocationId"
+     ]
+    },
+    "SubnetId": {
+     "Ref": "SageMakerAIStudioVPCPublicSubnet1SubnetA99048A6"
+    },
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "SageMakerAIStudioInfrastructureStack/SageMakerAIStudioVPC/PublicSubnet1"
+     }
+    ]
+   },
+   "DependsOn": [
+    "SageMakerAIStudioVPCPublicSubnet1DefaultRoute3EE529CE",
+    "SageMakerAIStudioVPCPublicSubnet1RouteTableAssociation5F72DBEF"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "SageMakerAIStudioInfrastructureStack/SageMakerAIStudioVPC/PublicSubnet1/NATGateway"
+   }
+  },
+  "SageMakerAIStudioVPCPublicSubnet2Subnet5B9D1869": {
+   "Type": "AWS::EC2::Subnet",
+   "Properties": {
+    "AvailabilityZone": "eu-central-1b",
+    "CidrBlock": "10.0.1.0/24",
+    "MapPublicIpOnLaunch": true,
+    "Tags": [
+     {
+      "Key": "aws-cdk:subnet-name",
+      "Value": "Public"
+     },
+     {
+      "Key": "aws-cdk:subnet-type",
+      "Value": "Public"
+     },
+     {
+      "Key": "Name",
+      "Value": "SageMakerAIStudioInfrastructureStack/SageMakerAIStudioVPC/PublicSubnet2"
+     }
+    ],
+    "VpcId": {
+     "Ref": "SageMakerAIStudioVPCA83855BE"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SageMakerAIStudioInfrastructureStack/SageMakerAIStudioVPC/PublicSubnet2/Subnet"
+   }
+  },
+  "SageMakerAIStudioVPCPublicSubnet2RouteTable06CA257B": {
+   "Type": "AWS::EC2::RouteTable",
+   "Properties": {
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "SageMakerAIStudioInfrastructureStack/SageMakerAIStudioVPC/PublicSubnet2"
+     }
+    ],
+    "VpcId": {
+     "Ref": "SageMakerAIStudioVPCA83855BE"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SageMakerAIStudioInfrastructureStack/SageMakerAIStudioVPC/PublicSubnet2/RouteTable"
+   }
+  },
+  "SageMakerAIStudioVPCPublicSubnet2RouteTableAssociationCBF4B369": {
+   "Type": "AWS::EC2::SubnetRouteTableAssociation",
+   "Properties": {
+    "RouteTableId": {
+     "Ref": "SageMakerAIStudioVPCPublicSubnet2RouteTable06CA257B"
+    },
+    "SubnetId": {
+     "Ref": "SageMakerAIStudioVPCPublicSubnet2Subnet5B9D1869"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SageMakerAIStudioInfrastructureStack/SageMakerAIStudioVPC/PublicSubnet2/RouteTableAssociation"
+   }
+  },
+  "SageMakerAIStudioVPCPublicSubnet2DefaultRoute816AA8C2": {
+   "Type": "AWS::EC2::Route",
+   "Properties": {
+    "DestinationCidrBlock": "0.0.0.0/0",
+    "GatewayId": {
+     "Ref": "SageMakerAIStudioVPCIGW67E658CD"
+    },
+    "RouteTableId": {
+     "Ref": "SageMakerAIStudioVPCPublicSubnet2RouteTable06CA257B"
+    }
+   },
+   "DependsOn": [
+    "SageMakerAIStudioVPCVPCGW35AB19BC"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "SageMakerAIStudioInfrastructureStack/SageMakerAIStudioVPC/PublicSubnet2/DefaultRoute"
+   }
+  },
+  "SageMakerAIStudioVPCPrivateSubnet1Subnet962BA3DE": {
+   "Type": "AWS::EC2::Subnet",
+   "Properties": {
+    "AvailabilityZone": "eu-central-1a",
+    "CidrBlock": "10.0.2.0/24",
+    "MapPublicIpOnLaunch": false,
+    "Tags": [
+     {
+      "Key": "aws-cdk:subnet-name",
+      "Value": "Private"
+     },
+     {
+      "Key": "aws-cdk:subnet-type",
+      "Value": "Private"
+     },
+     {
+      "Key": "Name",
+      "Value": "SageMakerAIStudioInfrastructureStack/SageMakerAIStudioVPC/PrivateSubnet1"
+     }
+    ],
+    "VpcId": {
+     "Ref": "SageMakerAIStudioVPCA83855BE"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SageMakerAIStudioInfrastructureStack/SageMakerAIStudioVPC/PrivateSubnet1/Subnet"
+   }
+  },
+  "SageMakerAIStudioVPCPrivateSubnet1RouteTable5353C869": {
+   "Type": "AWS::EC2::RouteTable",
+   "Properties": {
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "SageMakerAIStudioInfrastructureStack/SageMakerAIStudioVPC/PrivateSubnet1"
+     }
+    ],
+    "VpcId": {
+     "Ref": "SageMakerAIStudioVPCA83855BE"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SageMakerAIStudioInfrastructureStack/SageMakerAIStudioVPC/PrivateSubnet1/RouteTable"
+   }
+  },
+  "SageMakerAIStudioVPCPrivateSubnet1RouteTableAssociation27D6A7DC": {
+   "Type": "AWS::EC2::SubnetRouteTableAssociation",
+   "Properties": {
+    "RouteTableId": {
+     "Ref": "SageMakerAIStudioVPCPrivateSubnet1RouteTable5353C869"
+    },
+    "SubnetId": {
+     "Ref": "SageMakerAIStudioVPCPrivateSubnet1Subnet962BA3DE"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SageMakerAIStudioInfrastructureStack/SageMakerAIStudioVPC/PrivateSubnet1/RouteTableAssociation"
+   }
+  },
+  "SageMakerAIStudioVPCPrivateSubnet1DefaultRoute6513D44C": {
+   "Type": "AWS::EC2::Route",
+   "Properties": {
+    "DestinationCidrBlock": "0.0.0.0/0",
+    "NatGatewayId": {
+     "Ref": "SageMakerAIStudioVPCPublicSubnet1NATGatewayE45D9680"
+    },
+    "RouteTableId": {
+     "Ref": "SageMakerAIStudioVPCPrivateSubnet1RouteTable5353C869"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SageMakerAIStudioInfrastructureStack/SageMakerAIStudioVPC/PrivateSubnet1/DefaultRoute"
+   }
+  },
+  "SageMakerAIStudioVPCPrivateSubnet2Subnet355C2471": {
+   "Type": "AWS::EC2::Subnet",
+   "Properties": {
+    "AvailabilityZone": "eu-central-1b",
+    "CidrBlock": "10.0.3.0/24",
+    "MapPublicIpOnLaunch": false,
+    "Tags": [
+     {
+      "Key": "aws-cdk:subnet-name",
+      "Value": "Private"
+     },
+     {
+      "Key": "aws-cdk:subnet-type",
+      "Value": "Private"
+     },
+     {
+      "Key": "Name",
+      "Value": "SageMakerAIStudioInfrastructureStack/SageMakerAIStudioVPC/PrivateSubnet2"
+     }
+    ],
+    "VpcId": {
+     "Ref": "SageMakerAIStudioVPCA83855BE"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SageMakerAIStudioInfrastructureStack/SageMakerAIStudioVPC/PrivateSubnet2/Subnet"
+   }
+  },
+  "SageMakerAIStudioVPCPrivateSubnet2RouteTableE0B32CF2": {
+   "Type": "AWS::EC2::RouteTable",
+   "Properties": {
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "SageMakerAIStudioInfrastructureStack/SageMakerAIStudioVPC/PrivateSubnet2"
+     }
+    ],
+    "VpcId": {
+     "Ref": "SageMakerAIStudioVPCA83855BE"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SageMakerAIStudioInfrastructureStack/SageMakerAIStudioVPC/PrivateSubnet2/RouteTable"
+   }
+  },
+  "SageMakerAIStudioVPCPrivateSubnet2RouteTableAssociation409E856C": {
+   "Type": "AWS::EC2::SubnetRouteTableAssociation",
+   "Properties": {
+    "RouteTableId": {
+     "Ref": "SageMakerAIStudioVPCPrivateSubnet2RouteTableE0B32CF2"
+    },
+    "SubnetId": {
+     "Ref": "SageMakerAIStudioVPCPrivateSubnet2Subnet355C2471"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SageMakerAIStudioInfrastructureStack/SageMakerAIStudioVPC/PrivateSubnet2/RouteTableAssociation"
+   }
+  },
+  "SageMakerAIStudioVPCPrivateSubnet2DefaultRoute70893F0F": {
+   "Type": "AWS::EC2::Route",
+   "Properties": {
+    "DestinationCidrBlock": "0.0.0.0/0",
+    "NatGatewayId": {
+     "Ref": "SageMakerAIStudioVPCPublicSubnet1NATGatewayE45D9680"
+    },
+    "RouteTableId": {
+     "Ref": "SageMakerAIStudioVPCPrivateSubnet2RouteTableE0B32CF2"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SageMakerAIStudioInfrastructureStack/SageMakerAIStudioVPC/PrivateSubnet2/DefaultRoute"
+   }
+  },
+  "SageMakerAIStudioVPCIsolatedSubnet1Subnet39651D34": {
+   "Type": "AWS::EC2::Subnet",
+   "Properties": {
+    "AvailabilityZone": "eu-central-1a",
+    "CidrBlock": "10.0.4.0/28",
+    "MapPublicIpOnLaunch": false,
+    "Tags": [
+     {
+      "Key": "aws-cdk:subnet-name",
+      "Value": "Isolated"
+     },
+     {
+      "Key": "aws-cdk:subnet-type",
+      "Value": "Isolated"
+     },
+     {
+      "Key": "Name",
+      "Value": "SageMakerAIStudioInfrastructureStack/SageMakerAIStudioVPC/IsolatedSubnet1"
+     }
+    ],
+    "VpcId": {
+     "Ref": "SageMakerAIStudioVPCA83855BE"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SageMakerAIStudioInfrastructureStack/SageMakerAIStudioVPC/IsolatedSubnet1/Subnet"
+   }
+  },
+  "SageMakerAIStudioVPCIsolatedSubnet1RouteTable928C4721": {
+   "Type": "AWS::EC2::RouteTable",
+   "Properties": {
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "SageMakerAIStudioInfrastructureStack/SageMakerAIStudioVPC/IsolatedSubnet1"
+     }
+    ],
+    "VpcId": {
+     "Ref": "SageMakerAIStudioVPCA83855BE"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SageMakerAIStudioInfrastructureStack/SageMakerAIStudioVPC/IsolatedSubnet1/RouteTable"
+   }
+  },
+  "SageMakerAIStudioVPCIsolatedSubnet1RouteTableAssociationCF356A2F": {
+   "Type": "AWS::EC2::SubnetRouteTableAssociation",
+   "Properties": {
+    "RouteTableId": {
+     "Ref": "SageMakerAIStudioVPCIsolatedSubnet1RouteTable928C4721"
+    },
+    "SubnetId": {
+     "Ref": "SageMakerAIStudioVPCIsolatedSubnet1Subnet39651D34"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SageMakerAIStudioInfrastructureStack/SageMakerAIStudioVPC/IsolatedSubnet1/RouteTableAssociation"
+   }
+  },
+  "SageMakerAIStudioVPCIsolatedSubnet2SubnetFB7F1BE8": {
+   "Type": "AWS::EC2::Subnet",
+   "Properties": {
+    "AvailabilityZone": "eu-central-1b",
+    "CidrBlock": "10.0.4.16/28",
+    "MapPublicIpOnLaunch": false,
+    "Tags": [
+     {
+      "Key": "aws-cdk:subnet-name",
+      "Value": "Isolated"
+     },
+     {
+      "Key": "aws-cdk:subnet-type",
+      "Value": "Isolated"
+     },
+     {
+      "Key": "Name",
+      "Value": "SageMakerAIStudioInfrastructureStack/SageMakerAIStudioVPC/IsolatedSubnet2"
+     }
+    ],
+    "VpcId": {
+     "Ref": "SageMakerAIStudioVPCA83855BE"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SageMakerAIStudioInfrastructureStack/SageMakerAIStudioVPC/IsolatedSubnet2/Subnet"
+   }
+  },
+  "SageMakerAIStudioVPCIsolatedSubnet2RouteTable93C821AB": {
+   "Type": "AWS::EC2::RouteTable",
+   "Properties": {
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "SageMakerAIStudioInfrastructureStack/SageMakerAIStudioVPC/IsolatedSubnet2"
+     }
+    ],
+    "VpcId": {
+     "Ref": "SageMakerAIStudioVPCA83855BE"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SageMakerAIStudioInfrastructureStack/SageMakerAIStudioVPC/IsolatedSubnet2/RouteTable"
+   }
+  },
+  "SageMakerAIStudioVPCIsolatedSubnet2RouteTableAssociation0FE8A4F8": {
+   "Type": "AWS::EC2::SubnetRouteTableAssociation",
+   "Properties": {
+    "RouteTableId": {
+     "Ref": "SageMakerAIStudioVPCIsolatedSubnet2RouteTable93C821AB"
+    },
+    "SubnetId": {
+     "Ref": "SageMakerAIStudioVPCIsolatedSubnet2SubnetFB7F1BE8"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SageMakerAIStudioInfrastructureStack/SageMakerAIStudioVPC/IsolatedSubnet2/RouteTableAssociation"
+   }
+  },
+  "SageMakerAIStudioVPCIGW67E658CD": {
+   "Type": "AWS::EC2::InternetGateway",
+   "Properties": {
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "SageMakerAIStudioInfrastructureStack/SageMakerAIStudioVPC"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "SageMakerAIStudioInfrastructureStack/SageMakerAIStudioVPC/IGW"
+   }
+  },
+  "SageMakerAIStudioVPCVPCGW35AB19BC": {
+   "Type": "AWS::EC2::VPCGatewayAttachment",
+   "Properties": {
+    "InternetGatewayId": {
+     "Ref": "SageMakerAIStudioVPCIGW67E658CD"
+    },
+    "VpcId": {
+     "Ref": "SageMakerAIStudioVPCA83855BE"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SageMakerAIStudioInfrastructureStack/SageMakerAIStudioVPC/VPCGW"
+   }
+  },
+  "SageMakerAIStudioVPCS3FlowLogsFlowLog0D7B80B7": {
+   "Type": "AWS::EC2::FlowLog",
+   "Properties": {
+    "DeliverLogsPermissionArn": {
+     "Fn::GetAtt": [
+      "VPCFlowLogRole9538FF26",
+      "Arn"
+     ]
+    },
+    "LogDestinationType": "cloud-watch-logs",
+    "LogGroupName": {
+     "Ref": "VPCFlowLogGroup9559E1E7"
+    },
+    "ResourceId": {
+     "Ref": "SageMakerAIStudioVPCA83855BE"
+    },
+    "ResourceType": "VPC",
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "SageMakerAIStudioInfrastructureStack/SageMakerAIStudioVPC/S3FlowLogs"
+     }
+    ],
+    "TrafficType": "ALL"
+   },
+   "Metadata": {
+    "aws:cdk:path": "SageMakerAIStudioInfrastructureStack/SageMakerAIStudioVPC/S3FlowLogs/FlowLog"
+   }
+  },
+  "SageMakerAIStudioVPCRestrictDefaultSecurityGroupCustomResource0991B8AF": {
+   "Type": "Custom::VpcRestrictDefaultSG",
+   "Properties": {
+    "ServiceToken": {
+     "Fn::GetAtt": [
+      "CustomVpcRestrictDefaultSGCustomResourceProviderHandlerDC833E5E",
+      "Arn"
+     ]
+    },
+    "DefaultSecurityGroupId": {
+     "Fn::GetAtt": [
+      "SageMakerAIStudioVPCA83855BE",
+      "DefaultSecurityGroup"
+     ]
+    },
+    "Account": "796973481044"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "SageMakerAIStudioInfrastructureStack/SageMakerAIStudioVPC/RestrictDefaultSecurityGroupCustomResource/Default"
+   }
+  },
+  "CustomVpcRestrictDefaultSGCustomResourceProviderRole26592FE0": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Version": "2012-10-17",
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ]
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Sub": "arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+     }
+    ],
+    "Policies": [
+     {
+      "PolicyName": "Inline",
+      "PolicyDocument": {
+       "Version": "2012-10-17",
+       "Statement": [
+        {
+         "Effect": "Allow",
+         "Action": [
+          "ec2:AuthorizeSecurityGroupIngress",
+          "ec2:AuthorizeSecurityGroupEgress",
+          "ec2:RevokeSecurityGroupIngress",
+          "ec2:RevokeSecurityGroupEgress"
+         ],
+         "Resource": [
+          {
+           "Fn::Join": [
+            "",
+            [
+             "arn:aws:ec2:eu-central-1:796973481044:security-group/",
+             {
+              "Fn::GetAtt": [
+               "SageMakerAIStudioVPCA83855BE",
+               "DefaultSecurityGroup"
+              ]
+             }
+            ]
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "SageMakerAIStudioInfrastructureStack/Custom::VpcRestrictDefaultSGCustomResourceProvider/Role"
+   }
+  },
+  "CustomVpcRestrictDefaultSGCustomResourceProviderHandlerDC833E5E": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-796973481044-eu-central-1",
+     "S3Key": "7fa1e366ee8a9ded01fc355f704cff92bfd179574e6f9cfee800a3541df1b200.zip"
+    },
+    "Timeout": 900,
+    "MemorySize": 128,
+    "Handler": "__entrypoint__.handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "CustomVpcRestrictDefaultSGCustomResourceProviderRole26592FE0",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs22.x",
+    "Description": "Lambda function for removing all inbound/outbound rules from the VPC default security group"
+   },
+   "DependsOn": [
+    "CustomVpcRestrictDefaultSGCustomResourceProviderRole26592FE0"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "SageMakerAIStudioInfrastructureStack/Custom::VpcRestrictDefaultSGCustomResourceProvider/Handler",
+    "aws:asset:path": "asset.7fa1e366ee8a9ded01fc355f704cff92bfd179574e6f9cfee800a3541df1b200",
+    "aws:asset:property": "Code"
+   }
+  },
+  "SageMakerAIStudioDataBucketA8B46ECA": {
+   "Type": "AWS::S3::Bucket",
+   "Properties": {
+    "BucketEncryption": {
+     "ServerSideEncryptionConfiguration": [
+      {
+       "ServerSideEncryptionByDefault": {
+        "SSEAlgorithm": "AES256"
+       }
+      }
+     ]
+    },
+    "BucketName": "sagemaker-ai-studio-data-796973481044-eu-central-1",
+    "PublicAccessBlockConfiguration": {
+     "BlockPublicAcls": true,
+     "BlockPublicPolicy": true,
+     "IgnorePublicAcls": true,
+     "RestrictPublicBuckets": true
+    },
+    "Tags": [
+     {
+      "Key": "aws-cdk:auto-delete-objects",
+      "Value": "true"
+     }
+    ],
+    "VersioningConfiguration": {
+     "Status": "Enabled"
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "SageMakerAIStudioInfrastructureStack/SageMakerAIStudioDataBucket/Resource"
+   }
+  },
+  "SageMakerAIStudioDataBucketPolicyD13E7CD1": {
+   "Type": "AWS::S3::BucketPolicy",
+   "Properties": {
+    "Bucket": {
+     "Ref": "SageMakerAIStudioDataBucketA8B46ECA"
+    },
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "s3:DeleteObject*",
+        "s3:GetBucket*",
+        "s3:List*",
+        "s3:PutBucketPolicy"
+       ],
+       "Effect": "Allow",
+       "Principal": {
+        "AWS": {
+         "Fn::GetAtt": [
+          "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
+          "Arn"
+         ]
+        }
+       },
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "SageMakerAIStudioDataBucketA8B46ECA",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "SageMakerAIStudioDataBucketA8B46ECA",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SageMakerAIStudioInfrastructureStack/SageMakerAIStudioDataBucket/Policy/Resource"
+   }
+  },
+  "SageMakerAIStudioDataBucketAutoDeleteObjectsCustomResourceAF37BD37": {
+   "Type": "Custom::S3AutoDeleteObjects",
+   "Properties": {
+    "ServiceToken": {
+     "Fn::GetAtt": [
+      "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F",
+      "Arn"
+     ]
+    },
+    "BucketName": {
+     "Ref": "SageMakerAIStudioDataBucketA8B46ECA"
+    }
+   },
+   "DependsOn": [
+    "SageMakerAIStudioDataBucketPolicyD13E7CD1"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "SageMakerAIStudioInfrastructureStack/SageMakerAIStudioDataBucket/AutoDeleteObjectsCustomResource/Default"
+   }
+  },
+  "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Version": "2012-10-17",
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ]
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Sub": "arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "SageMakerAIStudioInfrastructureStack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Role"
+   }
+  },
+  "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-796973481044-eu-central-1",
+     "S3Key": "faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6.zip"
+    },
+    "Timeout": 900,
+    "MemorySize": 128,
+    "Handler": "index.handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs22.x",
+    "Description": {
+     "Fn::Join": [
+      "",
+      [
+       "Lambda function for auto-deleting objects in ",
+       {
+        "Ref": "SageMakerAIStudioDataBucketA8B46ECA"
+       },
+       " S3 bucket."
+      ]
+     ]
+    }
+   },
+   "DependsOn": [
+    "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "SageMakerAIStudioInfrastructureStack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Handler",
+    "aws:asset:path": "asset.faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6",
+    "aws:asset:property": "Code"
+   }
+  },
+  "SageMakerAIStudioExecutionRole8148BDE6": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "sagemaker.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Description": "IAM role for SageMaker AI Studio execution.",
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/AmazonSageMakerFullAccess"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "SageMakerAIStudioInfrastructureStack/SageMakerAIStudioExecutionRole/Resource"
+   }
+  },
+  "SageMakerAIStudioExecutionRoleDefaultPolicyD51111B5": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "s3:Abort*",
+        "s3:DeleteObject*",
+        "s3:GetBucket*",
+        "s3:GetObject*",
+        "s3:List*",
+        "s3:PutObject",
+        "s3:PutObjectLegalHold",
+        "s3:PutObjectRetention",
+        "s3:PutObjectTagging",
+        "s3:PutObjectVersionTagging"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "SageMakerAIStudioDataBucketA8B46ECA",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "SageMakerAIStudioDataBucketA8B46ECA",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      },
+      {
+       "Action": "logs:CreateLogGroup",
+       "Effect": "Allow",
+       "Resource": "arn:aws:logs:eu-central-1:796973481044:log-group:/aws/sagemaker/*"
+      },
+      {
+       "Action": [
+        "logs:CreateLogStream",
+        "logs:DescribeLogStreams",
+        "logs:PutLogEvents"
+       ],
+       "Effect": "Allow",
+       "Resource": "arn:aws:logs:eu-central-1:796973481044:log-group:/aws/sagemaker/*:log-stream:*"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "SageMakerAIStudioExecutionRoleDefaultPolicyD51111B5",
+    "Roles": [
+     {
+      "Ref": "SageMakerAIStudioExecutionRole8148BDE6"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "SageMakerAIStudioInfrastructureStack/SageMakerAIStudioExecutionRole/DefaultPolicy/Resource"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/+1W3U/bMBD/W/DjZDJGNTT1LS0MVQJaUcTDKoQc5xpMHTvyR7osyv8+OXbaQjcEGtrysCc7v/v63fV6vuPo+OhLdHRA1vqQpqtDzpKonhtCV5is9X3NSB7V15LDokZEa5tDOqrQsEaFYoKygvCYUmmFQUP0AeGg4wxiapgULdxglIKmihU7UI1Imt7ImeSMVmi4qJu7Ldg535MaQ+jDRHAmYCNDH9ArhC/7fVn6/olfEkEySLeRUL6LxCpo/4WavK0UbzS5w+OlcFXBHnaxN7RupJPssd2H03RuiIEchNFPwr4a/jdh2+x94g3mMtNRfSGzcyVtsagRD9crkkPoIgW5LLcldN1jlKxaiQHhu2hw5B13rhoM9Diqbwu6qNGSy/WFzHRwyIo4TRVoDR2Sk+/xj+5DEHNODKxJ1SHaJgLMWIoly6wiPuKiRmJL0qvcVIUDZjbhjCKMKEvVJdGrTZf/1kKxkhh4i8lES04MpHs2ocS3szH2ROatmRtWJWGcJIwzU32TonNbFnSShrtzNeKSrjaVKbyTSTEVF8QK+oCGRllwZSxPxs/UidYsE5OiPAklnoqxAvL0n94HFqE7rza/9W6P94FgP1j4VvIN5KeWNXBDEg5bfIvFWkvKWgcbZXc5m8zcsS02Dv3+7p25JFz3oOZ/RqM/THpCoz9M/tPoHY12Qk2EASVgM1/8+xe+4naVcTsI/uo3gUWNFGhpFYXwmrpQbrFg4rnrYNJgPYjqkaUrP7CskafAwcA0eQTqths/aBPH3WcYUwq62yGS1nJnrQFBVdXtwPPB/WV8FZ+fnb648JSgNJMCUh/NE/ScsD/CRlmHeDt57MqbBl+H/Nvl0718eGy1kfkv8KXowGc6MyVLloIaEQ041hrM3JCMiczZTK0prGnwrDIPUnwcRJ8G0eeDR83YobLCsByia3/+BKNCZBJwDQAA"
+   },
+   "Metadata": {
+    "aws:cdk:path": "SageMakerAIStudioInfrastructureStack/CDKMetadata/Default"
+   }
+  }
+ },
+ "Outputs": {
+  "SageMakerRoleArn": {
+   "Description": "ARN of the IAM role for SageMaker AI Studio.",
+   "Value": {
+    "Fn::GetAtt": [
+     "SageMakerAIStudioExecutionRole8148BDE6",
+     "Arn"
+    ]
+   }
+  },
+  "SageMakerDataBucketName": {
+   "Description": "Name of the S3 bucket for SageMaker AI Studio data.",
+   "Value": {
+    "Ref": "SageMakerAIStudioDataBucketA8B46ECA"
+   }
+  },
+  "SageMakerVpcId": {
+   "Description": "ID of the VPC created for SageMaker AI Studio.",
+   "Value": {
+    "Ref": "SageMakerAIStudioVPCA83855BE"
+   }
+  },
+  "VPCFlowLogGroupName": {
+   "Description": "Name of the CloudWatch Log Group for VPC Flow Logs.",
+   "Value": {
+    "Ref": "VPCFlowLogGroup9559E1E7"
+   }
+  },
+  "PublicSubnetId0": {
+   "Description": "ID of Public Subnet 0",
+   "Value": {
+    "Ref": "SageMakerAIStudioVPCPublicSubnet1SubnetA99048A6"
+   }
+  },
+  "PublicSubnetId1": {
+   "Description": "ID of Public Subnet 1",
+   "Value": {
+    "Ref": "SageMakerAIStudioVPCPublicSubnet2Subnet5B9D1869"
+   }
+  },
+  "PrivateSubnetId0": {
+   "Description": "ID of Private Subnet 0",
+   "Value": {
+    "Ref": "SageMakerAIStudioVPCPrivateSubnet1Subnet962BA3DE"
+   }
+  },
+  "PrivateSubnetId1": {
+   "Description": "ID of Private Subnet 1",
+   "Value": {
+    "Ref": "SageMakerAIStudioVPCPrivateSubnet2Subnet355C2471"
+   }
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}

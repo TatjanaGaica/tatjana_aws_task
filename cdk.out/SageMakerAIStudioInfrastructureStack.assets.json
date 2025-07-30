@@ -1,0 +1,51 @@
+{
+  "version": "45.0.0",
+  "files": {
+    "7fa1e366ee8a9ded01fc355f704cff92bfd179574e6f9cfee800a3541df1b200": {
+      "displayName": "SageMakerAIStudioInfrastructureStack/Custom::VpcRestrictDefaultSGCustomResourceProvider Code",
+      "source": {
+        "path": "asset.7fa1e366ee8a9ded01fc355f704cff92bfd179574e6f9cfee800a3541df1b200",
+        "packaging": "zip"
+      },
+      "destinations": {
+        "796973481044-eu-central-1-3c736562": {
+          "bucketName": "cdk-hnb659fds-assets-796973481044-eu-central-1",
+          "objectKey": "7fa1e366ee8a9ded01fc355f704cff92bfd179574e6f9cfee800a3541df1b200.zip",
+          "region": "eu-central-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::796973481044:role/cdk-hnb659fds-file-publishing-role-796973481044-eu-central-1"
+        }
+      }
+    },
+    "faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6": {
+      "displayName": "SageMakerAIStudioInfrastructureStack/Custom::S3AutoDeleteObjectsCustomResourceProvider Code",
+      "source": {
+        "path": "asset.faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6",
+        "packaging": "zip"
+      },
+      "destinations": {
+        "796973481044-eu-central-1-a216a485": {
+          "bucketName": "cdk-hnb659fds-assets-796973481044-eu-central-1",
+          "objectKey": "faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6.zip",
+          "region": "eu-central-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::796973481044:role/cdk-hnb659fds-file-publishing-role-796973481044-eu-central-1"
+        }
+      }
+    },
+    "80a7add3dc163fedb07d3eb895f2fbc2889d6af77f3a2f6d1acf290bbb28bd38": {
+      "displayName": "SageMakerAIStudioInfrastructureStack Template",
+      "source": {
+        "path": "SageMakerAIStudioInfrastructureStack.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "796973481044-eu-central-1-f4804cde": {
+          "bucketName": "cdk-hnb659fds-assets-796973481044-eu-central-1",
+          "objectKey": "80a7add3dc163fedb07d3eb895f2fbc2889d6af77f3a2f6d1acf290bbb28bd38.json",
+          "region": "eu-central-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::796973481044:role/cdk-hnb659fds-file-publishing-role-796973481044-eu-central-1"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}
